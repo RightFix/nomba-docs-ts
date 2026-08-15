@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Changelog — nomba-ts TypeScript SDK</title>
+<meta name="description" content="Version history for the nomba-ts TypeScript SDK.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<button class="nav-toggle" aria-label="Toggle navigation" aria-controls="sidebar">Menu</button>
+<div class="shell">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">nomba-ts <span class="stamp">TS-SDK</span></div>
+    <div class="brand-sub">unofficial · v1.0.0</div>
+    <nav class="toc">
+      <a href="index.html">Overview</a>
+      <a href="getting-started.html">Getting started</a>
+      <a href="features.html">Advanced features</a>
+      <a href="resources.html">API reference</a>
+      <div class="group-label">Resource groups</div>
+      <a href="resources.html#accounts">Accounts</a>
+      <a href="resources.html#virtual_accounts">Virtual Accounts</a>
+      <a href="resources.html#checkout">Online Checkout</a>
+      <a href="resources.html#charge">Charge</a>
+      <a href="resources.html#transfers">Transfers</a>
+      <a href="resources.html#terminals">Terminals</a>
+      <a href="resources.html#transactions">Transactions</a>
+      <a href="resources.html#airtime_data">Airtime and Data Vending</a>
+      <a href="resources.html#cabletv">CableTV Subscription</a>
+      <a href="resources.html#electricity">Electricity Vending</a>
+      <a href="resources.html#betting">Betting</a>
+      <a href="resources.html#direct_debits">Direct Debits</a>
+      <a href="resources.html#global_collections">Global Collections</a>
+      <a href="resources.html#global_payout">Global Payout</a>
+      <div class="group-label">More</div>
+      <a href="changelog.html">Changelog</a>
+    </nav>
+  </aside>
+
+  <main>
+    <span class="eyebrow">Changelog</span>
+    <h1>Version history</h1>
+
+    <h2>1.0.0</h2>
+    <p>Initial release of the TypeScript SDK.</p>
+    <ul style="color: var(--ink-dim);">
+      <li>All 86 endpoints from Nomba's OpenAPI spec, across 14 resource groups.</li>
+      <li>Async/await with <code>axios</code> HTTP client — TypeScript is async-first, no sync/async split.</li>
+      <li>Typed responses via generated TypeScript <code>interface</code>s.</li>
+      <li>Cursor pagination helpers (<code>paginate</code> async generator).</li>
+      <li>Guided card-payment OTP/3DS flow (<code>CardPaymentFlow</code>).</li>
+      <li>Webhook signature verification with replay-window protection.</li>
+      <li>Token-fetch locking and retry-with-backoff on 429/5xx.</li>
+      <li>Local nested request-body validation against the bundled spec.</li>
+      <li>Bounded-concurrency helper (<code>gatherLimited</code>) for fan-out calls.</li>
+      <li>OAuth2 client-credentials with automatic token caching and transparent 401 refresh.</li>
+    </ul>
+
+    <div class="page-foot">
+      <span>nomba-ts · unofficial TypeScript SDK</span>
+      <span><a href="index.html">Overview</a></span>
+    </div>
+  </main>
+</div>
+<script src="assets/app.js"></script>
+</body>
+</html>

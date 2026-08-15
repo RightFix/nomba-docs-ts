@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>API reference — nomba-ts TypeScript SDK</title>
+<meta name="description" content="All 86 Nomba API endpoints exposed by the nomba-ts TypeScript SDK, grouped by resource.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<button class="nav-toggle" aria-label="Toggle navigation" aria-controls="sidebar">Menu</button>
+<div class="shell">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">nomba-ts <span class="stamp">TS-SDK</span></div>
+    <div class="brand-sub">unofficial · v1.0.0</div>
+    <nav class="toc">
+      <a href="index.html">Overview</a>
+      <a href="getting-started.html">Getting started</a>
+      <a href="features.html">Advanced features</a>
+      <a href="resources.html">API reference</a>
+      <div class="group-label">Resource groups</div>
+      <a href="resources.html#accounts">Accounts</a>
+      <a href="resources.html#virtual_accounts">Virtual Accounts</a>
+      <a href="resources.html#checkout">Online Checkout</a>
+      <a href="resources.html#charge">Charge</a>
+      <a href="resources.html#transfers">Transfers</a>
+      <a href="resources.html#terminals">Terminals</a>
+      <a href="resources.html#transactions">Transactions</a>
+      <a href="resources.html#airtime_data">Airtime and Data Vending</a>
+      <a href="resources.html#cabletv">CableTV Subscription</a>
+      <a href="resources.html#electricity">Electricity Vending</a>
+      <a href="resources.html#betting">Betting</a>
+      <a href="resources.html#direct_debits">Direct Debits</a>
+      <a href="resources.html#global_collections">Global Collections</a>
+      <a href="resources.html#global_payout">Global Payout</a>
+      <div class="group-label">More</div>
+      <a href="changelog.html">Changelog</a>
+    </nav>
+  </aside>
+
+  <main>
+    <span class="eyebrow">API reference</span>
+    <h1>86 endpoints, 14 ledgers.</h1>
+    <p>
+      Every method below is available on the <code>Nomba</code> instance under
+      the resource group shown in each heading, e.g.
+      <code>nomba.virtualAccounts.createVirtualAccount(...)</code>. All methods
+      are <code>async</code> and return a typed <code>Promise</code>. Field
+      names and required/optional arguments are generated from Nomba's
+      OpenAPI spec.
+    </p>
+
+    <section id="accounts">
+      <h2>Accounts <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.accounts</span></h2>
+      <p>List sub-accounts, fetch details, and look up assigned terminals. 3 endpoints.</p>
+      <div class="ledger">
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/accounts</span>
+          <span class="fn">.listAllAccounts()</span>
+        </div>
+        <span class="summary">List all sub accounts</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/accounts/{accountId}</span>
+          <span class="fn">.fetchAccountDetails(accountId)</span>
+        </div>
+        <span class="summary">Fetch details of a sub account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/accounts/{accountId}/terminals</span>
+          <span class="fn">.fetchTerminalsAssignedToAccount(accountId)</span>
+        </div>
+        <span class="summary">Fetch terminals assigned to a sub account</span>
+      </div>
+      </div>
+    </section>
+
+    <section id="virtual_accounts">
+      <h2>Virtual Accounts <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.virtualAccounts</span></h2>
+      <p>Create, fetch, filter, and get transactions for virtual accounts. 4 endpoints.</p>
+      <div class="ledger">
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/virtual-accounts</span>
+          <span class="fn">.createVirtualAccount({ accountName, ... })</span>
+        </div>
+        <span class="summary">Create a virtual account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/virtual-accounts/{accountRef}</span>
+          <span class="fn">.fetchVirtualAccount(accountRef)</span>
+        </div>
+        <span class="summary">Fetch a virtual account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/virtual-accounts</span>
+          <span class="fn">.filterVirtualAccounts({ status?, ... })</span>
+        </div>
+        <span class="summary">Filter virtual accounts (paginated)</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/virtual-accounts/{accountRef}/transactions</span>
+          <span class="fn">.fetchVirtualAccountTransactions(accountRef, { limit?, cursor? })</span>
+        </div>
+        <span class="summary">Fetch transactions for a virtual account (paginated)</span>
+      </div>
+      </div>
+    </section>
+
+    <section id="checkout">
+      <h2>Online Checkout <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.checkout</span></h2>
+      <p>Hosted checkout orders and transaction management. 4 endpoints.</p>
+      <div class="ledger">
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/checkout/orders</span>
+          <span class="fn">.createOnlineCheckoutOrder({ orderReference, amount, ... })</span>
+        </div>
+        <span class="summary">Create an online checkout order</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/checkout/orders/{orderReference}</span>
+          <span class="fn">.fetchCheckoutOrder(orderReference)</span>
+        </div>
+        <span class="summary">Fetch checkout order details</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/checkout/orders/{orderReference}/transaction</span>
+          <span class="fn">.fetchCheckoutTransactionDetails(orderReference)</span>
+        </div>
+        <span class="summary">Fetch checkout transaction details</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/checkout/transactions/{transactionId}/cancel</span>
+          <span class="fn">.cancelCheckoutTransaction(transactionId, { forceCancel? })</span>
+        </div>
+        <span class="summary">Cancel a checkout transaction</span>
+      </div>
+      </div>
+    </section>
+
+    <section id="charge">
+      <h2>Charge <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.charge</span></h2>
+      <p>The card-payment sequence: card details, OTP, confirmation. 5 endpoints.</p>
+      <div class="ledger">
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/charge/card</span>
+          <span class="fn">.submitCustomerCardDetails({ cardDetails, key, orderReference, ... })</span>
+        </div>
+        <span class="summary">Submit customer card details for payment</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/charge/otp</span>
+          <span class="fn">.submitCustomerPaymentOtp({ otp, orderReference, transactionId })</span>
+        </div>
+        <span class="summary">Submit customer payment OTP</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/charge/otp/resend</span>
+          <span class="fn">.resendCustomerPaymentOtp({ orderReference })</span>
+        </div>
+        <span class="summary">Resend customer payment OTP</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/checkout/transaction</span>
+          <span class="fn">.fetchCheckoutTransactionDetails({ orderReference })</span>
+        </div>
+        <span class="summary">Fetch checkout transaction details</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/checkout/transaction/cancel</span>
+          <span class="fn">.cancelCheckoutTransaction({ transactionId, forceCancel? })</span>
+        </div>
+        <span class="summary">Cancel a checkout transaction</span>
+      </div>
+      </div>
+    </section>
+
+    <section id="transfers">
+      <h2>Transfers <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.transfers</span></h2>
+      <p>Bank account transfers and bulk transfers. 4 endpoints.</p>
+      <div class="ledger">
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/transfers</span>
+          <span class="fn">.transfer({ amount, accountNumber, bankCode, ... })</span>
+        </div>
+        <span class="summary">Perform a bank account transfer</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/transfers/bulk</span>
+          <span class="fn">.bulkTransfer({ transfers: [...] })</span>
+        </div>
+        <span class="summary">Perform bulk transfers</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/transfers/{transactionId}</span>
+          <span class="fn">.fetchTransfer(transactionId)</span>
+        </div>
+        <span class="summary">Fetch a transfer transaction</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/transfers</span>
+          <span class="fn">.fetchTransfers({ limit?, cursor? })</span>
+        </div>
+        <span class="summary">List all transfers (paginated)</span>
+      </div>
+      </div>
+    </section>
+
+    <section id="terminals">
+      <h2>Terminals <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.terminals</span></h2>
+      <p>List and look up POS terminals. 2 endpoints.</p>
+      <div class="ledger">
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/terminals</span>
+          <span class="fn">.fetchTerminals({ limit?, cursor? })</span>
+        </div>
+        <span class="summary">List all terminals (paginated)</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/terminals/{terminalId}</span>
+          <span class="fn">.fetchTerminalDetails(terminalId)</span>
+        </div>
+        <span class="summary">Fetch terminal details</span>
+      </div>
+      </div>
+    </section>
+
+    <section id="transactions">
+      <h2>Transactions <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.transactions</span></h2>
+      <p>Fetch and filter transaction history, paginated. 7 endpoints.</p>
+      <div class="ledger">
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/transactions/bank</span>
+          <span class="fn">.fetchCreditDebitTransactionsOnParentAccount({ limit?, cursor?, ... })</span>
+        </div>
+        <span class="summary">Fetch credit/debit transactions on parent account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/transactions/accounts</span>
+          <span class="fn">.fetchTransactionsOnParentAccount({ limit?, cursor?, ... })</span>
+        </div>
+        <span class="summary">Fetch transactions on parent account (paginated)</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/transactions/accounts</span>
+          <span class="fn">.filterParentAccountTransactions({ transactionRef?, ... })</span>
+        </div>
+        <span class="summary">Filter parent account transactions (paginated)</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/transactions/bank/{subAccountId}</span>
+          <span class="fn">.fetchCreditDebitTransactionsOnSubAccount(subAccountId, { ... })</span>
+        </div>
+        <span class="summary">Fetch credit/debit transactions on a sub account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/transactions/accounts/{subAccountId}</span>
+          <span class="fn">.fetchTransactionsOnSubAccount(subAccountId, { ... })</span>
+        </div>
+        <span class="summary">Fetch transactions on a sub account (paginated)</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/transactions/accounts/{subAccountId}</span>
+          <span class="fn">.filterSubAccountTransactions(subAccountId, { ... })</span>
+        </div>
+        <span class="summary">Filter sub account transactions (paginated)</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/transactions/requery/{sessionId}</span>
+          <span class="fn">.confirmTransactionStatus(sessionId)</span>
+        </div>
+        <span class="summary">Confirm a transaction status by session ID</span>
+      </div>
+      </div>
+    </section>
+
+    <section id="airtime_data">
+      <h2>Airtime and Data Vending <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.airtimeData</span></h2>
+      <p>Buy airtime and data bundles across telco networks. 5 endpoints.</p>
+      <div class="ledger">
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/bill/data-plan/{telco}</span>
+          <span class="fn">.fetchDataPlans(telco)</span>
+        </div>
+        <span class="summary">Fetch data plans on a telco network provider</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/bill/topup</span>
+          <span class="fn">.makeAirtimePurchaseViaParentAccount({ amount, phoneNumber, ... })</span>
+        </div>
+        <span class="summary">Make airtime purchases via parent account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/bill/topup/{subAccountId}</span>
+          <span class="fn">.makeAirtimePurchaseViaSubAccount(subAccountId, { ... })</span>
+        </div>
+        <span class="summary">Make airtime purchases via a sub account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/bill/data</span>
+          <span class="fn">.vendDataViaParentAccount({ amount, phoneNumber, ... })</span>
+        </div>
+        <span class="summary">Vend data bundles via parent account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/bill/data/{subAccountId}</span>
+          <span class="fn">.vendDataViaSubAccount(subAccountId, { ... })</span>
+        </div>
+        <span class="summary">Vend data bundles via a sub account</span>
+      </div>
+      </div>
+    </section>
+
+    <section id="cabletv">
+      <h2>CableTV Subscription <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.cableTv</span></h2>
+      <p>Cable TV provider lookups and subscription payments. 3 endpoints.</p>
+      <div class="ledger">
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/bill/cabletv/lookup</span>
+          <span class="fn">.cableTvLookup({ customerId, cableTvType })</span>
+        </div>
+        <span class="summary">Fetch customer information from a cable TV provider</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/bill/cabletv</span>
+          <span class="fn">.cableTvSubscriptionViaParentAccount({ cableTvType, ... })</span>
+        </div>
+        <span class="summary">CableTV subscription via parent account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/bill/cabletv/{subAccountId}</span>
+          <span class="fn">.cableTvSubscriptionViaSubAccount(subAccountId, { ... })</span>
+        </div>
+        <span class="summary">CableTV subscription via a sub account</span>
+      </div>
+      </div>
+    </section>
+
+    <section id="electricity">
+      <h2>Electricity Vending <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.electricity</span></h2>
+      <p>Electricity provider lookups and bill payments. 4 endpoints.</p>
+      <div class="ledger">
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/bill/electricity/discos</span>
+          <span class="fn">.fetchElectricityProviders()</span>
+        </div>
+        <span class="summary">Fetch electricity providers (discos)</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/bill/electricity/lookup</span>
+          <span class="fn">.electricityCustomerLookup({ disco, customerId })</span>
+        </div>
+        <span class="summary">Fetch customer information from an electricity provider</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/bill/electricity</span>
+          <span class="fn">.vendElectricityViaParentAccount({ disco, ... })</span>
+        </div>
+        <span class="summary">Vend electricity via parent account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/bill/electricity/{subAccountId}</span>
+          <span class="fn">.vendElectricityViaSubAccount(subAccountId, { ... })</span>
+        </div>
+        <span class="summary">Vend electricity via a specific account</span>
+      </div>
+      </div>
+    </section>
+
+    <section id="betting">
+      <h2>Betting <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.betting</span></h2>
+      <p>Betting provider lookups and voucher purchases. 4 endpoints.</p>
+      <div class="ledger">
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/bill/betting/providers</span>
+          <span class="fn">.fetchBettingProviders()</span>
+        </div>
+        <span class="summary">Fetch betting providers</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/bill/betting/lookup</span>
+          <span class="fn">.bettingCustomerLookup({ providerId, customerId })</span>
+        </div>
+        <span class="summary">Fetch customer information from a betting provider</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/bill/betting</span>
+          <span class="fn">.vendBettingViaParentAccount({ bettingProvider, ... })</span>
+        </div>
+        <span class="summary">Vend betting via parent account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/bill/betting/{subAccountId}</span>
+          <span class="fn">.vendBettingViaSubAccount(subAccountId, { ... })</span>
+        </div>
+        <span class="summary">Vend betting via a specific account</span>
+      </div>
+      </div>
+    </section>
+
+    <section id="direct_debits">
+      <h2>Direct Debits <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.directDebits</span></h2>
+      <p>Direct debit mandate management and collections. 6 endpoints.</p>
+      <div class="ledger">
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/direct-debits</span>
+          <span class="fn">.createDirectDebitMandate({ customerAccountNumber, ... })</span>
+        </div>
+        <span class="summary">Create a Direct Debit Mandate</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/direct-debits/mandates</span>
+          <span class="fn">.getMandates({ page, pageSize, ... })</span>
+        </div>
+        <span class="summary">Get mandates by filters</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/direct-debits/{mandateId}</span>
+          <span class="fn">.getMandateById(mandateId)</span>
+        </div>
+        <span class="summary">Get Mandate by ID</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/direct-debits/status</span>
+          <span class="fn">.getMandateStatus(mandateId)</span>
+        </div>
+        <span class="summary">Get Mandate Status</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method put">PUT</span>
+        <div>
+          <span class="path">/v1/direct-debits/update-status</span>
+          <span class="fn">.updateMandateStatus({ mandateId, status })</span>
+        </div>
+        <span class="summary">Update mandate status</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/direct-debits/debit-mandate</span>
+          <span class="fn">.debitMandate({ mandateId, amount })</span>
+        </div>
+        <span class="summary">Debit a mandate</span>
+      </div>
+      </div>
+    </section>
+
+    <section id="global_collections">
+      <h2>Global Collections <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.globalCollections</span></h2>
+      <p>Mobile money collections and DRC inflow providers. 4 endpoints.</p>
+      <div class="ledger">
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/global-collection/inflow/initiate</span>
+          <span class="fn">.initiateMobileMoneyInflow({ phoneNumber, ... })</span>
+        </div>
+        <span class="summary">Initiate mobile money collection</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/global-collection/transactions/{transactionId}</span>
+          <span class="fn">.fetchCollectionTransaction(transactionId)</span>
+        </div>
+        <span class="summary">Retrieve collection transaction status</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/global-collection/drc/inflow/providers</span>
+          <span class="fn">.fetchDrcInflowProviders()</span>
+        </div>
+        <span class="summary">Fetch DRC inflow providers</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/sandbox/global-collection/drc/inflow/providers</span>
+          <span class="fn">.fetchDrcInflowProvidersSandbox()</span>
+        </div>
+        <span class="summary">Fetch DRC inflow providers (sandbox)</span>
+      </div>
+      </div>
+    </section>
+
+    <section id="global_payout">
+      <h2>Global Payout <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.globalPayout</span></h2>
+      <p>Cross-border transfers, currency exchange, and payment methods. 7 endpoints.</p>
+      <div class="ledger">
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/global-payout/transfer/authorize</span>
+          <span class="fn">.authorizeTransfer({ amount, receiverName, ... })</span>
+        </div>
+        <span class="summary">Initiate and authorize cross-border transfer</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/global-payout/exchange/authorize</span>
+          <span class="fn">.authorizeExchange({ amount, sourceCurrency, ... })</span>
+        </div>
+        <span class="summary">Authorize currency exchange</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/global-payout/money/convert</span>
+          <span class="fn">.convertMoney({ amount, currency, ... })</span>
+        </div>
+        <span class="summary">Calculate currency conversion and lock exchange rate</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/global-payout/exchange-rates</span>
+          <span class="fn">.fetchExchangeRates(from, to, region?)</span>
+        </div>
+        <span class="summary">Retrieve exchange rates for a currency pair</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/global-payout/payment-methods</span>
+          <span class="fn">.fetchPaymentMethods(code?, name?)</span>
+        </div>
+        <span class="summary">Fetch supported payment methods</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/global-payout/bank/providers</span>
+          <span class="fn">.listInstitutionProviders(isMobileMoney?, countryIsoCode?)</span>
+        </div>
+        <span class="summary">List institution providers</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/global-payout/transactions/{transactionId}</span>
+          <span class="fn">.fetchGlobalPayoutTransaction(transactionId)</span>
+        </div>
+        <span class="summary">Track global payout transaction status</span>
+      </div>
+      </div>
+    </section>
+
+    <div class="page-foot">
+      <span>nomba-ts · unofficial TypeScript SDK</span>
+      <span><a href="getting-started.html">Getting started</a> · <a href="features.html">Advanced features</a></span>
+    </div>
+  </main>
+</div>
+<script src="assets/app.js"></script>
+</body>
+</html>

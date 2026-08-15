@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Getting started — nomba-ts TypeScript SDK</title>
+<meta name="description" content="Install nomba-ts, authenticate, and make your first request — async/await with full error handling and typed responses.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<button class="nav-toggle" aria-label="Toggle navigation" aria-controls="sidebar">Menu</button>
+<div class="shell">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">nomba-ts <span class="stamp">TS-SDK</span></div>
+    <div class="brand-sub">unofficial &middot; v1.0.0</div>
+    <nav class="toc">
+      <a href="index.html">Overview</a>
+      <a href="getting-started.html">Getting started</a>
+      <a href="features.html">Advanced features</a>
+      <a href="resources.html">API reference</a>
+      <div class="group-label">Resource groups</div>
+      <a href="resources.html#accounts">Accounts</a>
+      <a href="resources.html#virtual_accounts">Virtual Accounts</a>
+      <a href="resources.html#checkout">Online Checkout</a>
+      <a href="resources.html#charge">Charge</a>
+      <a href="resources.html#transfers">Transfers</a>
+      <a href="resources.html#terminals">Terminals</a>
+      <a href="resources.html#transactions">Transactions</a>
+      <a href="resources.html#airtime_data">Airtime and Data Vending</a>
+      <a href="resources.html#cabletv">CableTV Subscription</a>
+      <a href="resources.html#electricity">Electricity Vending</a>
+      <a href="resources.html#betting">Betting</a>
+      <a href="resources.html#direct_debits">Direct Debits</a>
+      <a href="resources.html#global_collections">Global Collections</a>
+      <a href="resources.html#global_payout">Global Payout</a>
+      <div class="group-label">More</div>
+      <a href="changelog.html">Changelog</a>
+    </nav>
+  </aside>
+
+  <main>
+    <span class="eyebrow">Getting started</span>
+    <h1>Install, authenticate, request.</h1>
+    <p>Three things you need from your Nomba dashboard: an <code>apiKey</code> (client ID), an <code>apiSecret</code>, and an <code>accountId</code>. The SDK handles the OAuth2 token exchange for you from there.</p>
+
+    <h2>Install</h2>
+    <pre><code>npm install nomba-ts
+# or
+yarn add nomba-ts
+# or
+pnpm add nomba-ts</code></pre>
+
+    <h2>Async client</h2>
+    <p>TypeScript is async-first — every resource method is an <code>async</code> function returning a <code>Promise</code>. Create one <code>Nomba</code> instance and reuse it; it manages its own axios connection pool and OAuth2 token cache.</p>
+    <pre><code>import { Nomba } from 'nomba-ts'
+
+const nomba = new Nomba({
+  apiKey: '...',
+  apiSecret: '...',
+  accountId: '...',  // optional, but recommended
+  baseUrl: 'https://api.nomba.com',  // default
+  verifySsl: true,                   // set false for sandbox
+})
+
+const account = await nomba.virtualAccounts.createVirtualAccount({
+  accountName: 'Jane Doe',
+})</code></pre>
+
+    <h3>ESM vs CommonJS</h2>
+    <p>The package is published as ESM. For CommonJS you can use a dynamic import:</p>
+    <pre><code>const { Nomba } = await import('nomba-ts')</code></pre>
+
+    <h2>Error handling</h2>
+    <p>All errors inherit from <code>NombaError</code>. The three you'll see most:</p>
+    <pre><code>import { NombaAPIError, NombaAuthError, NombaValidationError } from 'nomba-ts'
+
+try {
+  await nomba.virtualAccounts.fetchVirtualAccount('missing-ref')
+} catch (e) {
+  if (e instanceof NombaAuthError) {
+    console.log('auth failed:', e.message)
+  } else if (e instanceof NombaValidationError) {
+    console.log('bad request, caught locally:', e.missing)
+  } else if (e instanceof NombaAPIError) {
+    console.log('api error:', e.statusCode, e.code, e.responseBody)
+  }
+}</code></pre>
+
+    <div class="callout">
+      <span class="label">Note</span>
+      <p><code>NombaValidationError</code> is raised <em>before</em> any request goes out — it checks nested required fields (like everything inside a request body object) against Nomba's own spec. See <a href="features.html#validation">request validation</a>.</p>
+    </div>
+
+    <h2>Response shape</h2>
+    <p>Every method returns a typed <code>Promise&lt;T&gt;</code> generated from Nomba's response schema, mirroring Nomba's actual JSON keys (camelCase, not snake_case):</p>
+    <pre><code>const account = await nomba.virtualAccounts.createVirtualAccount({
+  accountName: 'Jane Doe',
+})
+console.log(account.data.accountNumber)
+console.log(account.code, account.description)</code></pre>
+
+    <div class="page-foot">
+      <span>nomba-ts · unofficial TypeScript SDK</span>
+      <span><a href="resources.html">API reference</a> · <a href="features.html">Advanced features</a></span>
+    </div>
+  </main>
+</div>
+<script src="assets/app.js"></script>
+</body>
+</html>

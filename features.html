@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Advanced features — nomba-ts TypeScript SDK</title>
+<meta name="description" content="Pagination via async generators, guided card-payment flow, webhook signature verification with replay protection, bounded concurrency, retry/backoff, and local request validation.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<button class="nav-toggle" aria-label="Toggle navigation" aria-controls="sidebar">Menu</button>
+<div class="shell">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">nomba-ts <span class="stamp">TS-SDK</span></div>
+    <div class="brand-sub">unofficial &middot; v1.0.0</div>
+    <nav class="toc">
+      <a href="index.html">Overview</a>
+      <a href="getting-started.html">Getting started</a>
+      <a href="features.html">Advanced features</a>
+      <a href="resources.html">API reference</a>
+      <div class="group-label">Resource groups</div>
+      <a href="resources.html#accounts">Accounts</a>
+      <a href="resources.html#virtual_accounts">Virtual Accounts</a>
+      <a href="resources.html#checkout">Online Checkout</a>
+      <a href="resources.html#charge">Charge</a>
+      <a href="resources.html#transfers">Transfers</a>
+      <a href="resources.html#terminals">Terminals</a>
+      <a href="resources.html#transactions">Transactions</a>
+      <a href="resources.html#airtime_data">Airtime and Data Vending</a>
+      <a href="resources.html#cabletv">CableTV Subscription</a>
+      <a href="resources.html#electricity">Electricity Vending</a>
+      <a href="resources.html#betting">Betting</a>
+      <a href="resources.html#direct_debits">Direct Debits</a>
+      <a href="resources.html#global_collections">Global Collections</a>
+      <a href="resources.html#global_payout">Global Payout</a>
+      <div class="group-label">More</div>
+      <a href="changelog.html">Changelog</a>
+    </nav>
+  </aside>
+
+  <main>
+    <span class="eyebrow">Advanced features</span>
+    <h1>Past raw HTTP calls.</h1>
+    <p>The generated resource methods cover every endpoint, but a few things needed more than a flat method signature. This page covers all of them.</p>
+
+    <section id="pagination">
+      <h2>Pagination</h2>
+      <p>
+        Nomba's list endpoints are cursor-paginated server-side — they
+        return a <code>cursor</code> you feed back in for the next page.
+        <code>paginate</code> drives that loop for you with an async
+        generator; no second pagination scheme is introduced.
+      </p>
+      <pre><code>import { Nomba, paginate } from 'nomba-ts'
+
+const nomba = new Nomba({ apiKey: '...', apiSecret: '...', accountId: '...' })
+
+for await (const account of paginate(nomba.accounts.listAllAccounts.bind(nomba.accounts))) {
+  console.log(account.accountRef)
+}</code></pre>
+      <p>Confirmed paginated endpoints: <code>accounts.listAllAccounts</code>, <code>accounts.fetchTerminalsAssignedToAccount</code>, <code>accounts.fetchTerminalsAssignedToParentAccount</code>, <code>virtualAccounts.filterVirtualAccounts</code>, and all six <code>transactions.*</code> list/filter methods.</p>
+    </section>
+
+    <section id="card-payment">
+      <h2>Guided card-payment flow</h2>
+      <p>
+        Card checkout is a multi-step sequence: submit card details, then
+        maybe an OTP, maybe a 3D Secure redirect, then confirm.
+        <code>CardPaymentFlow</code> wraps the sequence and decodes Nomba's
+        response codes into plain booleans, instead of you needing to know
+        what <code>"T0"</code> or <code>"S0"</code> mean.
+      </p>
+      <pre><code>const order = await nomba.checkout.createOnlineCheckoutOrder({
+  orderReference: 'order-001',
+  amount: '1000',
+  // ...
+})
+
+const flow = nomba.createCardPaymentFlow(order.data.orderReference)
+let step = await flow.submitCard({ cardDetails: '...', key: '' })
+
+if (step.requiresOtp) {
+  step = await flow.submitOtp('123456')
+} else if (step.requires3ds) {
+  // redirect the user using step.secureAuthenticationData
+}
+
+if (step.completed) {
+  const result = await flow.confirm()
+}</code></pre>
+      <p><code>step</code> is a <code>CardPaymentStep</code> with <code>.completed</code>, <code>.requiresOtp</code>, <code>.requires3ds</code>, <code>.transactionId</code>, <code>.message</code>. <code>nomba.createCardPaymentFlow(...)</code> returns a <code>CardPaymentFlow</code> instance.</p>
+    </section>
+
+    <section id="webhooks">
+      <h2>Webhook signature verification</h2>
+      <p>
+        Implements Nomba's documented HMAC-SHA256 scheme
+        (<code>nomba-signature</code> / <code>nomba-timestamp</code>
+        headers, base64-encoded signature) plus a replay-window check on the
+        timestamp — a valid signature alone doesn't prove a webhook wasn't
+        captured and resent later.
+      </p>
+      <pre><code>import { verifyWebhookRequest, NombaValidationError } from 'nomba-ts'
+
+app.post('/webhooks/nomba', (req, res) => {
+  try {
+    const payload = verifyWebhookRequest('your-signature-key', {
+      body: req.body,  // raw string or Buffer
+      headers: req.headers as Record<string, string>,
+      maxAgeSeconds: 300,  // default; reject webhooks older than 5 min
+    })
+
+    if (payload.event_type === 'payment_success') {
+      // ...
+    }
+    res.sendStatus(200)
+  } catch (e) {
+    if (e instanceof NombaValidationError) {
+      res.sendStatus(401)  // invalid signature or stale timestamp
+    }
+  }
+})</code></pre>
+      <p>Pass <code>maxAgeSeconds: null</code> to disable the replay check if you have your own.</p>
+    </section>
+
+    <section id="validation">
+      <h2>Local request validation</h2>
+      <p>
+        Flat fields are enforced by TypeScript itself. But nested objects —
+        like request bodies in checkout order creation — have their own
+        required fields that TypeScript can't check at the type level.
+        Every write call (<code>POST</code>/<code>PUT</code>) is validated
+        against Nomba's bundled OpenAPI spec before any network call.
+      </p>
+      <pre><code>import { NombaValidationError } from 'nomba-ts'
+
+try {
+  await nomba.checkout.createOnlineCheckoutOrder({ orderReference: 'x' })
+} catch (e) {
+  if (e instanceof NombaValidationError) {
+    console.log(e.message)
+    // Missing required field(s) in request body: amount, currency, ...
+    console.log(e.missing)  // ['amount', 'currency']
+  }
+}</code></pre>
+    </section>
+
+    <section id="reliability">
+      <h2>Reliability: locking + retry/backoff</h2>
+      <p>
+        The HTTP client guards token fetching with a lock, so concurrent
+        requests never race to re-fetch a token — only one fetch happens,
+        the rest reuse it. Requests that hit a <code>429</code> or transient
+        <code>5xx</code> retry automatically with exponential backoff,
+        respecting <code>Retry-After</code> when Nomba sends one.
+      </p>
+      <pre><code>const nomba = new Nomba({
+  apiKey: '...',
+  apiSecret: '...',
+  accountId: '...',
+  maxRetries: 3,      // default
+  retryDelay: 1000,   // default; delay ~= retryDelay * 2^attempt
+})</code></pre>
+    </section>
+
+    <section id="concurrency">
+      <h2>Bounded concurrency for fan-out calls</h2>
+      <p>
+        <code>Promise.all</code> has no built-in concurrency limit.
+        Firing off many calls at once can trigger a retry storm if several
+        start failing together, or just trip Nomba's rate limit by bursting
+        too many requests in one window. <code>gatherLimited</code> runs
+        the same calls with a cap.
+      </p>
+      <pre><code>import { gatherLimited } from 'nomba-ts'
+
+const calls = accountRefs.map((ref) => () => nomba.virtualAccounts.fetchVirtualAccount(ref))
+const results = await gatherLimited(calls, { limit: 5, returnExceptions: true })
+// results: (FetchVirtualAccountResponse | Error)[]</code></pre>
+    </section>
+
+    <div class="page-foot">
+      <span>nomba-ts · unofficial TypeScript SDK</span>
+      <span><a href="resources.html">API reference</a> · <a href="getting-started.html">Getting started</a></span>
+    </div>
+  </main>
+</div>
+<script src="assets/app.js"></script>
+</body>
+</html>
