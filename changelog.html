@@ -44,9 +44,17 @@
     <h1>Version history</h1>
 
     <h2>1.0.0</h2>
-    <p>Initial release of the TypeScript SDK.</p>
+    <p>Initial release of the TypeScript SDK, aligned with Nomba's published OpenAPI spec and the <code>nomba-python</code> SDK for full feature parity.</p>
     <ul style="color: var(--ink-dim);">
-      <li>All 86 endpoints from Nomba's OpenAPI spec, across 14 resource groups.</li>
+      <li>93 endpoints from Nomba's OpenAPI spec, across 14 resource groups.</li>
+      <li>Auth via the <code>accountId</code> header and the <code>/v1/auth/token/issue</code> token endpoint.</li>
+      <li>Full Accounts surface: list/create sub accounts, parent &amp; sub balances, suspend/reactivate, access control, and terminal assignment.</li>
+      <li>Virtual Accounts on <code>/v1/accounts/virtual/*</code>: create (parent or sub), fetch, filter, update, expire, and transactions.</li>
+      <li>Online Checkout covering orders, transaction management, tokenized cards, refunds, card-detail/OTP flows, flash account numbers, and the saved-card OTP flow.</li>
+      <li>Charge sequence on <code>/v1/checkout/*</code>: card details, OTP, resend, and confirm-receipt.</li>
+      <li>Transfers: bank-code lookup, account verification, and bank/wallet transfers from parent or sub accounts (<code>/v2/transfers/*</code>).</li>
+      <li>Terminals: assign/unassign (parent or sub account) and send a payment request to a terminal.</li>
+      <li>Global Collections and Global Payout (incl. payout accounts with a <code>useSandbox</code> flag).</li>
       <li>Async/await with <code>axios</code> HTTP client — TypeScript is async-first, no sync/async split.</li>
       <li>Typed responses via generated TypeScript <code>interface</code>s.</li>
       <li>Cursor pagination helpers (<code>paginate</code> async generator).</li>

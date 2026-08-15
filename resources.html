@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>API reference — nomba-ts TypeScript SDK</title>
-<meta name="description" content="All 86 Nomba API endpoints exposed by the nomba-ts TypeScript SDK, grouped by resource.">
+<meta name="description" content="All Nomba API endpoints exposed by the nomba-ts TypeScript SDK, grouped by resource.">
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -41,7 +41,7 @@
 
   <main>
     <span class="eyebrow">API reference</span>
-    <h1>86 endpoints, 14 ledgers.</h1>
+    <h1>93 endpoints, 14 ledgers.</h1>
     <p>
       Every method below is available on the <code>Nomba</code> instance under
       the resource group shown in each heading, e.g.
@@ -53,23 +53,79 @@
 
     <section id="accounts">
       <h2>Accounts <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.accounts</span></h2>
-      <p>List sub-accounts, fetch details, and look up assigned terminals. 3 endpoints.</p>
+      <p>Manage sub-accounts, balances, access control, and terminal assignment. 11 endpoints.</p>
       <div class="ledger">
       <div class="ledger-row">
         <span class="method get">GET</span>
         <div>
           <span class="path">/v1/accounts</span>
-          <span class="fn">.listAllAccounts()</span>
+          <span class="fn">.listAllAccounts(limit?, cursor?)</span>
         </div>
-        <span class="summary">List all sub accounts</span>
+        <span class="summary">List all sub accounts (paginated)</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/accounts</span>
+          <span class="fn">.createSubAccount({ accountRef, phoneNumber, email, bvn, pin, accountName, currency, ... })</span>
+        </div>
+        <span class="summary">Create a sub account</span>
       </div>
       <div class="ledger-row">
         <span class="method get">GET</span>
         <div>
-          <span class="path">/v1/accounts/{accountId}</span>
-          <span class="fn">.fetchAccountDetails(accountId)</span>
+          <span class="path">/v1/accounts/sub-account-details</span>
+          <span class="fn">.fetchAccountDetails({ accountId?, accountRef? })</span>
         </div>
         <span class="summary">Fetch details of a sub account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/accounts/parent</span>
+          <span class="fn">.fetchParentAccountDetails()</span>
+        </div>
+        <span class="summary">Fetch the parent account details</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/accounts/balance</span>
+          <span class="fn">.fetchParentAccountBalance()</span>
+        </div>
+        <span class="summary">Fetch the parent account balance</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/accounts/{subAccountId}/balance</span>
+          <span class="fn">.fetchSubAccountBalance(subAccountId)</span>
+        </div>
+        <span class="summary">Fetch a sub account balance</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method put">PUT</span>
+        <div>
+          <span class="path">/v1/accounts/suspend/{subAccountId}</span>
+          <span class="fn">.suspendSubAccount(subAccountId)</span>
+        </div>
+        <span class="summary">Suspend a sub account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method put">PUT</span>
+        <div>
+          <span class="path">/v1/accounts/reactivate/{subAccountId}</span>
+          <span class="fn">.reactivateSubAccount(subAccountId)</span>
+        </div>
+        <span class="summary">Reactivate a suspended sub account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method put">PUT</span>
+        <div>
+          <span class="path">/v1/accounts/{subAccountId}/access</span>
+          <span class="fn">.updateAccountAccess(subAccountId, { grantType, clientId, role })</span>
+        </div>
+        <span class="summary">Grant or deny access for a sub account</span>
       </div>
       <div class="ledger-row">
         <span class="method get">GET</span>
@@ -79,42 +135,74 @@
         </div>
         <span class="summary">Fetch terminals assigned to a sub account</span>
       </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/accounts/terminals</span>
+          <span class="fn">.fetchTerminalsAssignedToParentAccount()</span>
+        </div>
+        <span class="summary">Fetch terminals assigned to the parent account</span>
+      </div>
       </div>
     </section>
 
     <section id="virtual_accounts">
       <h2>Virtual Accounts <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.virtualAccounts</span></h2>
-      <p>Create, fetch, filter, and get transactions for virtual accounts. 4 endpoints.</p>
+      <p>Create, fetch, filter, update, and expire virtual accounts. 7 endpoints.</p>
       <div class="ledger">
       <div class="ledger-row">
         <span class="method post">POST</span>
         <div>
-          <span class="path">/v1/virtual-accounts</span>
-          <span class="fn">.createVirtualAccount({ accountName, ... })</span>
+          <span class="path">/v1/accounts/virtual</span>
+          <span class="fn">.createVirtualAccount({ accountRef, accountName, ... })</span>
         </div>
         <span class="summary">Create a virtual account</span>
       </div>
       <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/accounts/virtual/{subAccountId}</span>
+          <span class="fn">.createVirtualAccountForSubAccount(subAccountId, { accountRef, accountName, ... })</span>
+        </div>
+        <span class="summary">Create a virtual account for a sub account</span>
+      </div>
+      <div class="ledger-row">
         <span class="method get">GET</span>
         <div>
-          <span class="path">/v1/virtual-accounts/{accountRef}</span>
-          <span class="fn">.fetchVirtualAccount(accountRef)</span>
+          <span class="path">/v1/accounts/virtual/{identifier}</span>
+          <span class="fn">.fetchVirtualAccount(identifier)</span>
         </div>
         <span class="summary">Fetch a virtual account</span>
       </div>
       <div class="ledger-row">
-        <span class="method get">GET</span>
+        <span class="method post">POST</span>
         <div>
-          <span class="path">/v1/virtual-accounts</span>
-          <span class="fn">.filterVirtualAccounts({ status?, ... })</span>
+          <span class="path">/v1/accounts/virtual/list</span>
+          <span class="fn">.filterVirtualAccounts({ accountRef?, bvn?, bankAccountNumber?, expired?, resourceAcquired?, ... })</span>
         </div>
         <span class="summary">Filter virtual accounts (paginated)</span>
       </div>
       <div class="ledger-row">
+        <span class="method put">PUT</span>
+        <div>
+          <span class="path">/v1/accounts/virtual/{identifier}</span>
+          <span class="fn">.updateVirtualAccount(identifier, { newAccountRef?, accountName?, expectedAmount?, callbackUrl? })</span>
+        </div>
+        <span class="summary">Update a virtual account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method delete">DELETE</span>
+        <div>
+          <span class="path">/v1/accounts/virtual/{identifier}</span>
+          <span class="fn">.expireVirtualAccount(identifier)</span>
+        </div>
+        <span class="summary">Expire a virtual account</span>
+      </div>
+      <div class="ledger-row">
         <span class="method get">GET</span>
         <div>
-          <span class="path">/v1/virtual-accounts/{accountRef}/transactions</span>
-          <span class="fn">.fetchVirtualAccountTransactions(accountRef, { limit?, cursor? })</span>
+          <span class="path">/v1/accounts/virtual/{identifier}/transactions</span>
+          <span class="fn">.fetchVirtualAccountTransactions(identifier, { limit?, cursor? })</span>
         </div>
         <span class="summary">Fetch transactions for a virtual account (paginated)</span>
       </div>
@@ -123,20 +211,20 @@
 
     <section id="checkout">
       <h2>Online Checkout <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.checkout</span></h2>
-      <p>Hosted checkout orders and transaction management. 4 endpoints.</p>
+      <p>Hosted checkout orders, transaction management, tokenized cards, and saved-card flows. 18 endpoints.</p>
       <div class="ledger">
       <div class="ledger-row">
         <span class="method post">POST</span>
         <div>
-          <span class="path">/v1/checkout/orders</span>
-          <span class="fn">.createOnlineCheckoutOrder({ orderReference, amount, ... })</span>
+          <span class="path">/v1/checkout/order</span>
+          <span class="fn">.createOnlineCheckoutOrder({ order: { ... }, tokenizeCard })</span>
         </div>
         <span class="summary">Create an online checkout order</span>
       </div>
       <div class="ledger-row">
         <span class="method get">GET</span>
         <div>
-          <span class="path">/v1/checkout/orders/{orderReference}</span>
+          <span class="path">/v1/checkout/order/{orderReference}</span>
           <span class="fn">.fetchCheckoutOrder(orderReference)</span>
         </div>
         <span class="summary">Fetch checkout order details</span>
@@ -144,18 +232,130 @@
       <div class="ledger-row">
         <span class="method get">GET</span>
         <div>
-          <span class="path">/v1/checkout/orders/{orderReference}/transaction</span>
-          <span class="fn">.fetchCheckoutTransactionDetails(orderReference)</span>
+          <span class="path">/v1/checkout/transaction</span>
+          <span class="fn">.fetchCheckoutTransactionDetails({ idType, id })</span>
         </div>
         <span class="summary">Fetch checkout transaction details</span>
       </div>
       <div class="ledger-row">
         <span class="method post">POST</span>
         <div>
-          <span class="path">/v1/checkout/transactions/{transactionId}/cancel</span>
-          <span class="fn">.cancelCheckoutTransaction(transactionId, { forceCancel? })</span>
+          <span class="path">/v1/checkout/transaction/cancel</span>
+          <span class="fn">.cancelCheckoutTransaction({ transactionId, forceCancel? })</span>
         </div>
         <span class="summary">Cancel a checkout transaction</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/checkout/tokenized-card-payment</span>
+          <span class="fn">.chargeTokenizedCard({ orderReference, amount, currency, cardToken, ... })</span>
+        </div>
+        <span class="summary">Charge a tokenized card</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/checkout/tokenized-card-data</span>
+          <span class="fn">.listTokenizedCards()</span>
+        </div>
+        <span class="summary">List tokenized cards</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/checkout/tokenized-card-data</span>
+          <span class="fn">.updateTokenizedCard({ cardToken, cardPan?, cardExpiry? })</span>
+        </div>
+        <span class="summary">Update a tokenized card</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method delete">DELETE</span>
+        <div>
+          <span class="path">/v1/checkout/tokenized-card-data</span>
+          <span class="fn">.deleteTokenizedCard({ cardToken })</span>
+        </div>
+        <span class="summary">Delete a tokenized card</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/checkout/refund</span>
+          <span class="fn">.refundCheckoutTransaction({ transactionId, amount?, reason? })</span>
+        </div>
+        <span class="summary">Refund a checkout transaction</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/checkout/order/cancel</span>
+          <span class="fn">.cancelCheckoutOrder({ orderReference, reason? })</span>
+        </div>
+        <span class="summary">Cancel a checkout order</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/checkout/checkout-card-detail</span>
+          <span class="fn">.submitCustomerCardDetails({ cardDetails, key, orderReference, ... })</span>
+        </div>
+        <span class="summary">Submit customer card details for payment</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/checkout/checkout-card-otp</span>
+          <span class="fn">.submitCustomerCardOtp({ otp, orderReference, transactionId })</span>
+        </div>
+        <span class="summary">Submit customer payment OTP</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/checkout/resend-otp</span>
+          <span class="fn">.resendCustomerOtp({ orderReference })</span>
+        </div>
+        <span class="summary">Resend customer payment OTP</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/checkout/get-checkout-kta/{orderReference}</span>
+          <span class="fn">.fetchCheckoutFlashAccountNumber(orderReference)</span>
+        </div>
+        <span class="summary">Fetch a flash (KTA) account number for checkout</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/checkout/user-card/auth</span>
+          <span class="fn">.requestOtpBeforeSavingCard({ orderReference, phoneNumber })</span>
+        </div>
+        <span class="summary">Request OTP before saving a card</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/checkout/user-card/saved-card/auth</span>
+          <span class="fn">.requestOtpForSavedCards({ orderReference, email })</span>
+        </div>
+        <span class="summary">Request OTP for a user's saved cards</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/checkout/user-card</span>
+          <span class="fn">.submitUserOtp({ otp, orderReference, phoneNumber })</span>
+        </div>
+        <span class="summary">Submit user OTP to authorize saved-card use</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/checkout/user-card/{orderReference}</span>
+          <span class="fn">.getUserSavedCards(orderReference, otp)</span>
+        </div>
+        <span class="summary">Fetch a user's saved cards</span>
       </div>
       </div>
     </section>
@@ -167,7 +367,7 @@
       <div class="ledger-row">
         <span class="method post">POST</span>
         <div>
-          <span class="path">/v1/charge/card</span>
+          <span class="path">/v1/checkout/checkout-card-detail</span>
           <span class="fn">.submitCustomerCardDetails({ cardDetails, key, orderReference, ... })</span>
         </div>
         <span class="summary">Submit customer card details for payment</span>
@@ -175,26 +375,26 @@
       <div class="ledger-row">
         <span class="method post">POST</span>
         <div>
-          <span class="path">/v1/charge/otp</span>
-          <span class="fn">.submitCustomerPaymentOtp({ otp, orderReference, transactionId })</span>
+          <span class="path">/v1/checkout/checkout-card-otp</span>
+          <span class="fn">.submitCustomerCardOtp({ otp, orderReference, transactionId })</span>
         </div>
         <span class="summary">Submit customer payment OTP</span>
       </div>
       <div class="ledger-row">
         <span class="method post">POST</span>
         <div>
-          <span class="path">/v1/charge/otp/resend</span>
-          <span class="fn">.resendCustomerPaymentOtp({ orderReference })</span>
+          <span class="path">/v1/checkout/resend-otp</span>
+          <span class="fn">.resendCustomerOtp({ orderReference })</span>
         </div>
         <span class="summary">Resend customer payment OTP</span>
       </div>
       <div class="ledger-row">
-        <span class="method get">GET</span>
+        <span class="method post">POST</span>
         <div>
-          <span class="path">/v1/checkout/transaction</span>
-          <span class="fn">.fetchCheckoutTransactionDetails({ orderReference })</span>
+          <span class="path">/v1/checkout/confirm-transaction-receipt</span>
+          <span class="fn">.fetchCheckoutTransactionDetails(orderReference)</span>
         </div>
-        <span class="summary">Fetch checkout transaction details</span>
+        <span class="summary">Confirm a transaction receipt and fetch its details</span>
       </div>
       <div class="ledger-row">
         <span class="method post">POST</span>
@@ -209,62 +409,102 @@
 
     <section id="transfers">
       <h2>Transfers <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.transfers</span></h2>
-      <p>Bank account transfers and bulk transfers. 4 endpoints.</p>
+      <p>Bank-code lookups, account verification, and bank/wallet transfers from parent or sub accounts. 6 endpoints.</p>
       <div class="ledger">
       <div class="ledger-row">
-        <span class="method post">POST</span>
-        <div>
-          <span class="path">/v1/transfers</span>
-          <span class="fn">.transfer({ amount, accountNumber, bankCode, ... })</span>
-        </div>
-        <span class="summary">Perform a bank account transfer</span>
-      </div>
-      <div class="ledger-row">
-        <span class="method post">POST</span>
-        <div>
-          <span class="path">/v1/transfers/bulk</span>
-          <span class="fn">.bulkTransfer({ transfers: [...] })</span>
-        </div>
-        <span class="summary">Perform bulk transfers</span>
-      </div>
-      <div class="ledger-row">
         <span class="method get">GET</span>
         <div>
-          <span class="path">/v1/transfers/{transactionId}</span>
-          <span class="fn">.fetchTransfer(transactionId)</span>
+          <span class="path">/v1/transfers/banks</span>
+          <span class="fn">.fetchBankCodes()</span>
         </div>
-        <span class="summary">Fetch a transfer transaction</span>
+        <span class="summary">Fetch supported bank codes</span>
       </div>
       <div class="ledger-row">
-        <span class="method get">GET</span>
+        <span class="method post">POST</span>
         <div>
-          <span class="path">/v1/transfers</span>
-          <span class="fn">.fetchTransfers({ limit?, cursor? })</span>
+          <span class="path">/v1/transfers/bank/lookup</span>
+          <span class="fn">.bankAccountLookup({ accountNumber, bankCode })</span>
         </div>
-        <span class="summary">List all transfers (paginated)</span>
+        <span class="summary">Look up a bank account name</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v2/transfers/bank</span>
+          <span class="fn">.bankTransferFromParent({ amount, accountNumber, bankCode, accountName, merchantTxRef, ... })</span>
+        </div>
+        <span class="summary">Bank transfer from the parent account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v2/transfers/bank/{subAccountId}</span>
+          <span class="fn">.bankTransferFromSubAccount(subAccountId, { amount, accountNumber, bankCode, accountName, merchantTxRef, ... })</span>
+        </div>
+        <span class="summary">Bank transfer from a sub account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v2/transfers/wallet</span>
+          <span class="fn">.walletTransferFromParent({ amount, receiverAccountId, merchantTxRef, narration, ... })</span>
+        </div>
+        <span class="summary">Wallet transfer from the parent account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v2/transfers/wallet/{subAccountId}</span>
+          <span class="fn">.walletTransferFromSubAccount(subAccountId, { amount, receiverAccountId, merchantTxRef, narration, ... })</span>
+        </div>
+        <span class="summary">Wallet transfer from a sub account</span>
       </div>
       </div>
     </section>
 
     <section id="terminals">
       <h2>Terminals <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.terminals</span></h2>
-      <p>List and look up POS terminals. 2 endpoints.</p>
+      <p>Assign, unassign, and send payment requests to POS terminals. 5 endpoints.</p>
       <div class="ledger">
       <div class="ledger-row">
-        <span class="method get">GET</span>
+        <span class="method post">POST</span>
         <div>
-          <span class="path">/v1/terminals</span>
-          <span class="fn">.fetchTerminals({ limit?, cursor? })</span>
+          <span class="path">/v1/terminals/assign</span>
+          <span class="fn">.assignTerminalToParent({ serialNumber, terminalLabel? })</span>
         </div>
-        <span class="summary">List all terminals (paginated)</span>
+        <span class="summary">Assign a terminal to the parent account</span>
       </div>
       <div class="ledger-row">
-        <span class="method get">GET</span>
+        <span class="method post">POST</span>
         <div>
-          <span class="path">/v1/terminals/{terminalId}</span>
-          <span class="fn">.fetchTerminalDetails(terminalId)</span>
+          <span class="path">/v1/terminals/assign/{subAccountId}</span>
+          <span class="fn">.assignTerminalToSubAccount(subAccountId, { serialNumber, terminalLabel? })</span>
         </div>
-        <span class="summary">Fetch terminal details</span>
+        <span class="summary">Assign a terminal to a sub account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/terminals/unassign</span>
+          <span class="fn">.unassignTerminalFromParent({ serialNumber, terminalLabel? })</span>
+        </div>
+        <span class="summary">Unassign a terminal from the parent account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/terminals/unassign/{subAccountId}</span>
+          <span class="fn">.unassignTerminalFromSubAccount(subAccountId, { serialNumber, terminalLabel? })</span>
+        </div>
+        <span class="summary">Unassign a terminal from a sub account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/terminals/payment-request/{terminalId}</span>
+          <span class="fn">.sendPaymentRequestToTerminal(terminalId, { merchantTxRef, amount, currency })</span>
+        </div>
+        <span class="summary">Send a payment request to a terminal</span>
       </div>
       </div>
     </section>
@@ -545,13 +785,13 @@
 
     <section id="global_collections">
       <h2>Global Collections <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.globalCollections</span></h2>
-      <p>Mobile money collections and DRC inflow providers. 4 endpoints.</p>
+      <p>Mobile money collections and DRC inflow providers. 3 endpoints.</p>
       <div class="ledger">
       <div class="ledger-row">
         <span class="method post">POST</span>
         <div>
           <span class="path">/v1/global-collection/inflow/initiate</span>
-          <span class="fn">.initiateMobileMoneyInflow({ phoneNumber, ... })</span>
+          <span class="fn">.initiateMobileMoneyInflow({ phoneNumber, callbackUrl, amount, currency, topupVendor, ... })</span>
         </div>
         <span class="summary">Initiate mobile money collection</span>
       </div>
@@ -567,24 +807,16 @@
         <span class="method get">GET</span>
         <div>
           <span class="path">/v1/global-collection/drc/inflow/providers</span>
-          <span class="fn">.fetchDrcInflowProviders()</span>
+          <span class="fn">.fetchDrcInflowProviders(useSandbox?)</span>
         </div>
-        <span class="summary">Fetch DRC inflow providers</span>
-      </div>
-      <div class="ledger-row">
-        <span class="method get">GET</span>
-        <div>
-          <span class="path">/v1/sandbox/global-collection/drc/inflow/providers</span>
-          <span class="fn">.fetchDrcInflowProvidersSandbox()</span>
-        </div>
-        <span class="summary">Fetch DRC inflow providers (sandbox)</span>
+        <span class="summary">Fetch DRC inflow providers (pass <code>useSandbox: true</code> for the sandbox path)</span>
       </div>
       </div>
     </section>
 
     <section id="global_payout">
       <h2>Global Payout <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.globalPayout</span></h2>
-      <p>Cross-border transfers, currency exchange, and payment methods. 7 endpoints.</p>
+      <p>Cross-border transfers, currency exchange, payment methods, and payout accounts. 9 endpoints.</p>
       <div class="ledger">
       <div class="ledger-row">
         <span class="method post">POST</span>
@@ -641,6 +873,22 @@
           <span class="fn">.fetchGlobalPayoutTransaction(transactionId)</span>
         </div>
         <span class="summary">Track global payout transaction status</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/global-payout/accounts</span>
+          <span class="fn">.fetchGlobalPayoutAccounts(useSandbox?)</span>
+        </div>
+        <span class="summary">List payout accounts (pass <code>useSandbox: true</code> for the sandbox path)</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/global-payout/accounts/{accountId}</span>
+          <span class="fn">.fetchGlobalPayoutAccount(accountId, useSandbox?)</span>
+        </div>
+        <span class="summary">Fetch a payout account (pass <code>useSandbox: true</code> for the sandbox path)</span>
       </div>
       </div>
     </section>

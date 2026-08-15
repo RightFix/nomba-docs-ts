@@ -64,10 +64,13 @@ const nomba = new Nomba({
 })
 
 const account = await nomba.virtualAccounts.createVirtualAccount({
+  accountRef: 'acct-jane',
   accountName: 'Jane Doe',
-})</code></pre>
+})
+console.log(account.data.accountNumber)
+console.log(account.code, account.description)</code></pre>
 
-    <h3>ESM vs CommonJS</h2>
+    <h3>ESM vs CommonJS</h3>
     <p>The package is published as ESM. For CommonJS you can use a dynamic import:</p>
     <pre><code>const { Nomba } = await import('nomba-ts')</code></pre>
 
@@ -95,10 +98,43 @@ try {
     <h2>Response shape</h2>
     <p>Every method returns a typed <code>Promise&lt;T&gt;</code> generated from Nomba's response schema, mirroring Nomba's actual JSON keys (camelCase, not snake_case):</p>
     <pre><code>const account = await nomba.virtualAccounts.createVirtualAccount({
+  accountRef: 'acct-jane',
   accountName: 'Jane Doe',
 })
 console.log(account.data.accountNumber)
 console.log(account.code, account.description)</code></pre>
+
+    <h2>Creating a checkout order</h2>
+    <p>The checkout order body is wrapped in an <code>order</code> object and takes a <code>tokenizeCard</code> flag:</p>
+    <pre><code>const order = await nomba.checkout.createOnlineCheckoutOrder({
+  order: {
+    orderReference: 'order-001',
+    customerId: 'cust-001',
+    callbackUrl: 'https://example.com/cb',
+    customerEmail: 'jane@example.com',
+    amount: 1000,
+    currency: 'NGN',
+    allowedPaymentMethods: ['CARD', 'ACCOUNT_TRANSFER'],
+  },
+  tokenizeCard: false,
+})
+console.log(order.data.checkoutLink)</code></pre>
+
+    <h2>Local request validation</h2>
+    <p>Write calls are validated against Nomba's spec before any network request, so you catch missing fields early:</p>
+    <pre><code>import { NombaValidationError } from 'nomba-ts'
+
+try {
+  await nomba.checkout.createOnlineCheckoutOrder({
+    order: { orderReference: 'x', customerId: 'c', callbackUrl: 'https://example.com/cb', customerEmail: 'a@b.com', amount: 1000, currency: 'NGN' },
+    tokenizeCard: false,
+  })
+} catch (e) {
+  if (e instanceof NombaValidationError) {
+    console.log(e.message)
+    console.log(e.missing)  // ['...']
+  }
+}</code></pre>
 
     <div class="page-foot">
       <span>nomba-ts · unofficial TypeScript SDK</span>

@@ -72,9 +72,15 @@ for await (const account of paginate(nomba.accounts.listAllAccounts.bind(nomba.a
         what <code>"T0"</code> or <code>"S0"</code> mean.
       </p>
       <pre><code>const order = await nomba.checkout.createOnlineCheckoutOrder({
-  orderReference: 'order-001',
-  amount: '1000',
-  // ...
+  order: {
+    orderReference: 'order-001',
+    customerId: 'cust-001',
+    callbackUrl: 'https://example.com/cb',
+    customerEmail: 'jane@example.com',
+    amount: 1000,
+    currency: 'NGN',
+  },
+  tokenizeCard: false,
 })
 
 const flow = nomba.createCardPaymentFlow(order.data.orderReference)
@@ -136,7 +142,10 @@ app.post('/webhooks/nomba', (req, res) => {
       <pre><code>import { NombaValidationError } from 'nomba-ts'
 
 try {
-  await nomba.checkout.createOnlineCheckoutOrder({ orderReference: 'x' })
+  await nomba.checkout.createOnlineCheckoutOrder({
+    order: { orderReference: 'x', customerId: 'c', callbackUrl: 'https://example.com/cb', customerEmail: 'a@b.com', amount: 1000, currency: 'NGN' },
+    tokenizeCard: false,
+  })
 } catch (e) {
   if (e instanceof NombaValidationError) {
     console.log(e.message)
