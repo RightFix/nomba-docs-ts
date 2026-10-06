@@ -13,7 +13,7 @@
 
   <aside class="sidebar" id="sidebar">
     <div class="brand">nomba-ts <span class="stamp">TS-SDK</span></div>
-    <div class="brand-sub">unofficial · v1.0.0</div>
+    <div class="brand-sub">unofficial · v0.1.0</div>
     <nav class="toc">
       <a href="index.html">Overview</a>
       <a href="getting-started.html">Getting started</a>
@@ -41,7 +41,7 @@
 
   <main>
     <span class="eyebrow">API reference</span>
-    <h1>93 endpoints, 14 ledgers.</h1>
+    <h1>106 methods, 14 ledgers.</h1>
     <p>
       Every method below is available on the <code>Nomba</code> instance under
       the resource group shown in each heading, e.g.
@@ -362,7 +362,8 @@
 
     <section id="charge">
       <h2>Charge <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.charge</span></h2>
-      <p>The card-payment sequence: card details, OTP, confirmation. 5 endpoints.</p>
+      <p>The card-payment sequence: card details, OTP, confirmation. 6 methods (one deprecated alias).</p>
+      <p style="font-size: .9rem;">Note: <code>charge.fetchCheckoutTransactionDetails(orderReference)</code> still works as a deprecated alias of <code>confirmTransactionReceipt</code>.</p>
       <div class="ledger">
       <div class="ledger-row">
         <span class="method post">POST</span>
@@ -392,7 +393,7 @@
         <span class="method post">POST</span>
         <div>
           <span class="path">/v1/checkout/confirm-transaction-receipt</span>
-          <span class="fn">.fetchCheckoutTransactionDetails(orderReference)</span>
+          <span class="fn">.confirmTransactionReceipt(orderReference)</span>
         </div>
         <span class="summary">Confirm a transaction receipt and fetch its details</span>
       </div>
@@ -511,7 +512,7 @@
 
     <section id="transactions">
       <h2>Transactions <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.transactions</span></h2>
-      <p>Fetch and filter transaction history, paginated. 7 endpoints.</p>
+      <p>Fetch and filter transaction history, paginated — plus single-transaction verification (sandbox + production). 9 methods.</p>
       <div class="ledger">
       <div class="ledger-row">
         <span class="method get">GET</span>
@@ -564,6 +565,22 @@
       <div class="ledger-row">
         <span class="method get">GET</span>
         <div>
+          <span class="path">/v1/transactions/accounts/single</span>
+          <span class="fn">.fetchSingleTransactionOnParentAccount({ transactionRef?, merchantTxRef?, orderReference?, orderId? })</span>
+        </div>
+        <span class="summary">Verify a payment on the parent account — check <code>data.status === 'SUCCESS'</code> before delivering value</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
+          <span class="path">/v1/transactions/accounts/{subAccountId}/single</span>
+          <span class="fn">.fetchSingleTransactionOnSubAccount(subAccountId, { ... })</span>
+        </div>
+        <span class="summary">Verify a payment on a sub account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method get">GET</span>
+        <div>
           <span class="path">/v1/transactions/requery/{sessionId}</span>
           <span class="fn">.confirmTransactionStatus(sessionId)</span>
         </div>
@@ -574,7 +591,7 @@
 
     <section id="airtime_data">
       <h2>Airtime and Data Vending <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.airtimeData</span></h2>
-      <p>Buy airtime and data bundles across telco networks. 5 endpoints.</p>
+      <p>Buy airtime and data bundles across telco networks. 9 methods — the <code>/v1/bill/*</code> variants are deprecated by Nomba; prefer the <code>/v2/bill/*</code> variants.</p>
       <div class="ledger">
       <div class="ledger-row">
         <span class="method get">GET</span>
@@ -590,7 +607,7 @@
           <span class="path">/v1/bill/topup</span>
           <span class="fn">.makeAirtimePurchaseViaParentAccount({ amount, phoneNumber, ... })</span>
         </div>
-        <span class="summary">Make airtime purchases via parent account</span>
+        <span class="summary">Make airtime purchases via parent account (deprecated, use V2)</span>
       </div>
       <div class="ledger-row">
         <span class="method post">POST</span>
@@ -598,7 +615,7 @@
           <span class="path">/v1/bill/topup/{subAccountId}</span>
           <span class="fn">.makeAirtimePurchaseViaSubAccount(subAccountId, { ... })</span>
         </div>
-        <span class="summary">Make airtime purchases via a sub account</span>
+        <span class="summary">Make airtime purchases via a sub account (deprecated, use V2)</span>
       </div>
       <div class="ledger-row">
         <span class="method post">POST</span>
@@ -606,7 +623,7 @@
           <span class="path">/v1/bill/data</span>
           <span class="fn">.vendDataViaParentAccount({ amount, phoneNumber, ... })</span>
         </div>
-        <span class="summary">Vend data bundles via parent account</span>
+        <span class="summary">Vend data bundles via parent account (deprecated, use V2)</span>
       </div>
       <div class="ledger-row">
         <span class="method post">POST</span>
@@ -614,14 +631,46 @@
           <span class="path">/v1/bill/data/{subAccountId}</span>
           <span class="fn">.vendDataViaSubAccount(subAccountId, { ... })</span>
         </div>
-        <span class="summary">Vend data bundles via a sub account</span>
+        <span class="summary">Vend data bundles via a sub account (deprecated, use V2)</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v2/bill/topup</span>
+          <span class="fn">.makeAirtimePurchaseViaParentAccountV2({ amount, phoneNumber, network, merchantTxRef, ... })</span>
+        </div>
+        <span class="summary">Make airtime purchases via parent account (v2)</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v2/bill/topup/{subAccountId}</span>
+          <span class="fn">.makeAirtimePurchaseViaSubAccountV2(subAccountId, { ... })</span>
+        </div>
+        <span class="summary">Make airtime purchases via a sub account (v2)</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v2/bill/data</span>
+          <span class="fn">.vendDataViaParentAccountV2({ amount, phoneNumber, network, merchantTxRef, ... })</span>
+        </div>
+        <span class="summary">Vend data bundles via parent account (v2)</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v2/bill/data/{subAccountId}</span>
+          <span class="fn">.vendDataViaSubAccountV2(subAccountId, { ... })</span>
+        </div>
+        <span class="summary">Vend data bundles via a sub account (v2)</span>
       </div>
       </div>
     </section>
 
     <section id="cabletv">
       <h2>CableTV Subscription <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.cableTv</span></h2>
-      <p>Cable TV provider lookups and subscription payments. 3 endpoints.</p>
+      <p>Cable TV provider lookups and subscription payments. 5 methods — the <code>/v1/bill/*</code> variants are deprecated by Nomba; prefer the <code>/v2/bill/*</code> variants.</p>
       <div class="ledger">
       <div class="ledger-row">
         <span class="method get">GET</span>
@@ -637,7 +686,7 @@
           <span class="path">/v1/bill/cabletv</span>
           <span class="fn">.cableTvSubscriptionViaParentAccount({ cableTvType, ... })</span>
         </div>
-        <span class="summary">CableTV subscription via parent account</span>
+        <span class="summary">CableTV subscription via parent account (deprecated, use V2)</span>
       </div>
       <div class="ledger-row">
         <span class="method post">POST</span>
@@ -645,14 +694,30 @@
           <span class="path">/v1/bill/cabletv/{subAccountId}</span>
           <span class="fn">.cableTvSubscriptionViaSubAccount(subAccountId, { ... })</span>
         </div>
-        <span class="summary">CableTV subscription via a sub account</span>
+        <span class="summary">CableTV subscription via a sub account (deprecated, use V2)</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v2/bill/cabletv</span>
+          <span class="fn">.cableTvSubscriptionViaParentAccountV2({ cableTvType, ... })</span>
+        </div>
+        <span class="summary">CableTV subscription via parent account (v2)</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v2/bill/cabletv/{subAccountId}</span>
+          <span class="fn">.cableTvSubscriptionViaSubAccountV2(subAccountId, { ... })</span>
+        </div>
+        <span class="summary">CableTV subscription via a sub account (v2)</span>
       </div>
       </div>
     </section>
 
     <section id="electricity">
       <h2>Electricity Vending <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.electricity</span></h2>
-      <p>Electricity provider lookups and bill payments. 4 endpoints.</p>
+      <p>Electricity provider lookups and bill payments. 6 methods — the <code>/v1/bill/*</code> variants are deprecated by Nomba; prefer the <code>/v2/bill/*</code> variants.</p>
       <div class="ledger">
       <div class="ledger-row">
         <span class="method get">GET</span>
@@ -676,7 +741,7 @@
           <span class="path">/v1/bill/electricity</span>
           <span class="fn">.vendElectricityViaParentAccount({ disco, ... })</span>
         </div>
-        <span class="summary">Vend electricity via parent account</span>
+        <span class="summary">Vend electricity via parent account (deprecated, use V2)</span>
       </div>
       <div class="ledger-row">
         <span class="method post">POST</span>
@@ -684,14 +749,30 @@
           <span class="path">/v1/bill/electricity/{subAccountId}</span>
           <span class="fn">.vendElectricityViaSubAccount(subAccountId, { ... })</span>
         </div>
-        <span class="summary">Vend electricity via a specific account</span>
+        <span class="summary">Vend electricity via a specific account (deprecated, use V2)</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v2/bill/electricity</span>
+          <span class="fn">.vendElectricityViaParentAccountV2({ disco, ... })</span>
+        </div>
+        <span class="summary">Vend electricity via parent account (v2)</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v2/bill/electricity/{subAccountId}</span>
+          <span class="fn">.vendElectricityViaSubAccountV2(subAccountId, { ... })</span>
+        </div>
+        <span class="summary">Vend electricity via a specific account (v2)</span>
       </div>
       </div>
     </section>
 
     <section id="betting">
       <h2>Betting <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.betting</span></h2>
-      <p>Betting provider lookups and voucher purchases. 4 endpoints.</p>
+      <p>Betting provider lookups and voucher purchases. 6 methods — the <code>/v1/bill/*</code> variants are deprecated by Nomba; prefer the <code>/v2/bill/*</code> variants.</p>
       <div class="ledger">
       <div class="ledger-row">
         <span class="method get">GET</span>
@@ -715,7 +796,7 @@
           <span class="path">/v1/bill/betting</span>
           <span class="fn">.vendBettingViaParentAccount({ bettingProvider, ... })</span>
         </div>
-        <span class="summary">Vend betting via parent account</span>
+        <span class="summary">Vend betting via parent account (deprecated, use V2)</span>
       </div>
       <div class="ledger-row">
         <span class="method post">POST</span>
@@ -723,7 +804,23 @@
           <span class="path">/v1/bill/betting/{subAccountId}</span>
           <span class="fn">.vendBettingViaSubAccount(subAccountId, { ... })</span>
         </div>
-        <span class="summary">Vend betting via a specific account</span>
+        <span class="summary">Vend betting via a specific account (deprecated, use V2)</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v2/bill/betting</span>
+          <span class="fn">.vendBettingViaParentAccountV2({ bettingProvider, ... })</span>
+        </div>
+        <span class="summary">Vend betting via parent account (v2)</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v2/bill/betting/{subAccountId}</span>
+          <span class="fn">.vendBettingViaSubAccountV2(subAccountId, { ... })</span>
+        </div>
+        <span class="summary">Vend betting via a specific account (v2)</span>
       </div>
       </div>
     </section>

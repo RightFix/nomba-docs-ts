@@ -13,7 +13,7 @@
 
   <aside class="sidebar" id="sidebar">
     <div class="brand">nomba-ts <span class="stamp">TS-SDK</span></div>
-    <div class="brand-sub">unofficial · v1.0.0</div>
+    <div class="brand-sub">unofficial · v0.1.0</div>
     <nav class="toc">
       <a href="index.html">Overview</a>
       <a href="getting-started.html">Getting started</a>
@@ -43,6 +43,19 @@
     <span class="eyebrow">Changelog</span>
     <h1>Version history</h1>
 
+    <h2>0.1.0</h2>
+    <p>Docs-first audit against <code>developer.nomba.com</code>: auth, verify, webhooks, retries, and bill v2.</p>
+    <ul style="color: var(--ink-dim);">
+      <li>Auth now follows the docs contract: JSON <code>{ grant_type, client_id, client_secret }</code> to <code>/v1/auth/token/issue</code> with the <code>accountId</code> header, envelope parsing (<code>access_token</code> / <code>refresh_token</code> / <code>expiresAt</code>), proactive refresh via <code>/v1/auth/token/refresh</code>, plus manual <code>refreshAccessToken()</code> / <code>revokeAccessToken()</code>. <code>401</code>s throw <code>NombaAuthError</code> immediately (never retried).</li>
+      <li>Only envelope <code>code</code> <code>00</code>/<code>200</code>/<code>201</code> counts as success; other codes throw <code>NombaAPIError</code> with the gateway <code>description</code>.</li>
+      <li><code>429</code> retries honor <code>Retry-After</code>.</li>
+      <li><code>charge.confirmTransactionReceipt()</code> is the canonical confirm-receipt name (<code>fetchCheckoutTransactionDetails</code> kept as a deprecated alias); verify guidance split into sandbox+prod single-transaction lookup vs production-only rich checkout details.</li>
+      <li>Card flow accepts both <code>S0</code> and <code>SO</code> as 3D Secure required.</li>
+      <li>Webhook verification accepts the <code>nomba-sig-value</code> header alias and no longer throws on length-mismatched signatures.</li>
+      <li>Bill v2 methods added (<code>POST /v2/bill/*</code>) with <code>V2BillTransaction</code> response types; v1 bill methods marked deprecated.</li>
+      <li>Bundled spec merged up to 100 paths from the live OpenAPI (14 added: v2 bills, global-payout accounts).</li>
+    </ul>
+
     <h2>1.0.0</h2>
     <p>Initial release of the TypeScript SDK, aligned with Nomba's published OpenAPI spec and the <code>nomba-python</code> SDK for full feature parity.</p>
     <ul style="color: var(--ink-dim);">
@@ -63,7 +76,7 @@
       <li>Token-fetch locking and retry-with-backoff on 429/5xx.</li>
       <li>Local nested request-body validation against the bundled spec.</li>
       <li>Bounded-concurrency helper (<code>gatherLimited</code>) for fan-out calls.</li>
-      <li>OAuth2 client-credentials with automatic token caching and transparent 401 refresh.</li>
+      <li>OAuth2 client-credentials with automatic token caching and proactive refresh; manual refresh/revoke available.</li>
     </ul>
 
     <div class="page-foot">

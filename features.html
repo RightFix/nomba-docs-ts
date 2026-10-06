@@ -13,7 +13,7 @@
 
   <aside class="sidebar" id="sidebar">
     <div class="brand">nomba-ts <span class="stamp">TS-SDK</span></div>
-    <div class="brand-sub">unofficial &middot; v1.0.0</div>
+    <div class="brand-sub">unofficial &middot; v0.1.0</div>
     <nav class="toc">
       <a href="index.html">Overview</a>
       <a href="getting-started.html">Getting started</a>
@@ -68,8 +68,9 @@ for await (const account of paginate(nomba.accounts.listAllAccounts.bind(nomba.a
         Card checkout is a multi-step sequence: submit card details, then
         maybe an OTP, maybe a 3D Secure redirect, then confirm.
         <code>CardPaymentFlow</code> wraps the sequence and decodes Nomba's
-        response codes into plain booleans, instead of you needing to know
-        what <code>"T0"</code> or <code>"S0"</code> mean.
+        response codes into plain booleans (<code>00</code> success,
+        <code>T0</code> OTP, <code>S0</code>/<code>SO</code> 3D Secure —
+        both spellings appear in Nomba's spec, both are accepted).
       </p>
       <pre><code>const order = await nomba.checkout.createOnlineCheckoutOrder({
   order: {
@@ -95,17 +96,41 @@ if (step.requiresOtp) {
 if (step.completed) {
   const result = await flow.confirm()
 }</code></pre>
-      <p><code>step</code> is a <code>CardPaymentStep</code> with <code>.completed</code>, <code>.requiresOtp</code>, <code>.requires3ds</code>, <code>.transactionId</code>, <code>.message</code>. <code>nomba.createCardPaymentFlow(...)</code> returns a <code>CardPaymentFlow</code> instance.</p>
+      <p><code>step</code> is a <code>CardPaymentStep</code> with <code>.completed</code>, <code>.requiresOtp</code>, <code>.requires3ds</code>, <code>.transactionId</code>, <code>.message</code>. <code>nomba.createCardPaymentFlow(...)</code> returns a <code>CardPaymentFlow</code> instance. <code>flow.confirm()</code> calls <code>charge.confirmTransactionReceipt(orderReference)</code> (<code>POST /v1/checkout/confirm-transaction-receipt</code>).</p>
+    </section>
+
+    <section id="verify">
+      <h2>Verify before delivering value</h2>
+      <p>
+        Webhooks notify in real time, but always confirm with the API first.
+        For sandbox <em>and</em> production, look up the transaction and check
+        <code>data.status === 'SUCCESS'</code>:
+      </p>
+      <pre><code>const tx = await nomba.transactions.fetchSingleTransactionOnParentAccount({
+  orderReference: 'order-001',  // or orderId, transactionRef, merchantTxRef
+})
+if (tx.data.status === 'SUCCESS') {
+  // deliver goods/services
+}</code></pre>
+      <p>
+        For production-only rich details (card, transfer, order metadata), use
+        <code>checkout.fetchCheckoutTransactionDetails({ idType: 'ORDER_REFERENCE', id })</code>
+        and check <code>transactionDetails.status === 'PAYMENT SUCCESSFUL'</code>
+        (<code>statusCode</code> is the card-processor code and is empty on
+        non-card rails, so it can't confirm payment).
+      </p>
     </section>
 
     <section id="webhooks">
       <h2>Webhook signature verification</h2>
       <p>
         Implements Nomba's documented HMAC-SHA256 scheme
-        (<code>nomba-signature</code> / <code>nomba-timestamp</code>
-        headers, base64-encoded signature) plus a replay-window check on the
-        timestamp — a valid signature alone doesn't prove a webhook wasn't
-        captured and resent later.
+        (<code>nomba-signature</code>, or its <code>nomba-sig-value</code>
+        alias, plus <code>nomba-timestamp</code> headers, base64-encoded
+        signature over
+        <code>event_type:requestId:userId:walletId:transactionId:type:time:responseCode:timestamp</code>)
+        plus a replay-window check on the timestamp — a valid signature
+        alone doesn't prove a webhook wasn't captured and resent later.
       </p>
       <pre><code>import { verifyWebhookRequest, NombaValidationError } from 'nomba-ts'
 
@@ -160,9 +185,19 @@ try {
       <p>
         The HTTP client guards token fetching with a lock, so concurrent
         requests never race to re-fetch a token — only one fetch happens,
-        the rest reuse it. Requests that hit a <code>429</code> or transient
+        the rest reuse it. Tokens live 30 minutes and are refreshed
+        proactively (5-minute buffer) via
+        <code>/v1/auth/token/refresh</code>; <code>refreshAccessToken()</code>
+        and <code>revokeAccessToken()</code> are also available for manual
+        control. Requests that hit a <code>429</code> or transient
         <code>5xx</code> retry automatically with exponential backoff,
         respecting <code>Retry-After</code> when Nomba sends one.
+        <code>401</code>s are never retried — the cache is cleared and a
+        <code>NombaAuthError</code> is thrown immediately. Every response
+        envelope is checked too: only <code>code</code>
+        <code>00</code>/<code>200</code>/<code>201</code> counts as success,
+        anything else throws <code>NombaAPIError</code> with the gateway
+        <code>description</code>.
       </p>
       <pre><code>const nomba = new Nomba({
   apiKey: '...',
