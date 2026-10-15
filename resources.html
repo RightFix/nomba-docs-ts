@@ -846,9 +846,9 @@
         <span class="method post">POST</span>
         <div>
           <span class="path">/v1/global-payout/transfer/authorize</span>
-          <span class="fn">.authorizeTransfer({ amount, receiverName, ... })</span>
+          <span class="fn">.authorizeTransfer({ amount, receiverName, idempotencyKey?, ... })</span>
         </div>
-        <span class="summary">Initiate and authorize cross-border transfer</span>
+        <span class="summary">Initiate and authorize cross-border transfer (resend <code>idempotencyKey</code> on retry to avoid duplicates)</span>
       </div>
       <div class="ledger-row">
         <span class="method post">POST</span>
