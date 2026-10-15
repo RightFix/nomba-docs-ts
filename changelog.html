@@ -13,7 +13,7 @@
 
   <aside class="sidebar" id="sidebar">
     <div class="brand">nomba-ts <span class="stamp">TS-SDK</span></div>
-    <div class="brand-sub">unofficial · v0.1.0</div>
+    <div class="brand-sub">unofficial · v0.2.0</div>
     <nav class="toc">
       <a href="index.html">Overview</a>
       <a href="getting-started.html">Getting started</a>
@@ -42,6 +42,17 @@
   <main>
     <span class="eyebrow">Changelog</span>
     <h1>Version history</h1>
+
+    <h2>0.2.0</h2>
+    <p>October 2026 Nomba docs update. Breaking: deprecated v1 bill methods removed, v2 implementations take the clean base names (no <code>V2</code> suffixes anywhere).</p>
+    <ul style="color: var(--ink-dim);">
+      <li>New: <code>cableTv.fetchCableTvPlans(cableTvType)</code> (<code>GET /v1/bill/cableTvProduct</code>, dstv | gotv | startimes | showmax).</li>
+      <li><code>electricityCustomerLookup</code> now uses <code>GET /v2/bill/electricity/lookup</code>, returning customer <code>name</code> and <code>address</code>.</li>
+      <li>Data vending now requires <code>productId</code> from Fetch Data Plans (<code>amount</code>-only purchase removed); <code>DataPlan</code> carries <code>productId</code>, responses include <code>productId</code>/<code>plan</code>.</li>
+      <li>Virtual accounts: <code>nin</code> and <code>restrictInflowToAccountName</code> options on create; <code>identifierType</code> on fetch; <code>callbackUrl</code> removed from update.</li>
+      <li>Removed: <code>charge.fetchCheckoutTransactionDetails</code> alias (use <code>confirmTransactionReceipt</code>).</li>
+      <li>Bundled spec refreshed to the live 102-path OpenAPI (incl. <code>Intl Transfer</code> payment method).</li>
+    </ul>
 
     <h2>0.1.0</h2>
     <p>Docs-first audit against <code>developer.nomba.com</code>: auth, verify, webhooks, retries, and bill v2.</p>
