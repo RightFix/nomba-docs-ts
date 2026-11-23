@@ -13,7 +13,7 @@
 
   <aside class="sidebar" id="sidebar">
     <div class="brand">nomba-ts <span class="stamp">TS-SDK</span></div>
-    <div class="brand-sub">unofficial · v0.2.1</div>
+    <div class="brand-sub">unofficial · v0.2.3</div>
     <nav class="toc">
       <a href="index.html">Overview</a>
       <a href="getting-started.html">Getting started</a>
@@ -148,7 +148,7 @@
 
     <section id="virtual_accounts">
       <h2>Virtual Accounts <span style="font-family: var(--font-mono); font-size: .6em; color: var(--ink-faint); font-weight: 400;">nomba.virtualAccounts</span></h2>
-      <p>Create, fetch, filter, update, and expire virtual accounts. 7 endpoints.</p>
+      <p>Create, fetch, filter, update, expire, and simulate inflows into virtual accounts. 8 endpoints.</p>
       <div class="ledger">
       <div class="ledger-row">
         <span class="method post">POST</span>
@@ -197,6 +197,14 @@
           <span class="fn">.expireVirtualAccount(identifier)</span>
         </div>
         <span class="summary">Expire a virtual account</span>
+      </div>
+      <div class="ledger-row">
+        <span class="method post">POST</span>
+        <div>
+          <span class="path">/v1/accounts/virtual/{identifier}/simulate-inflow</span>
+          <span class="fn">.simulateInflow(identifier, { amount, senderAccountName, senderAccountNumber?, senderBankCode?, narration? })</span>
+        </div>
+        <span class="summary">Simulate an inflow into a SIMULATED sandbox virtual account (sandbox only)</span>
       </div>
       <div class="ledger-row">
         <span class="method get">GET</span>

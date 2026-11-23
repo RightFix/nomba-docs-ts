@@ -13,7 +13,7 @@
 
   <aside class="sidebar" id="sidebar">
     <div class="brand">nomba-ts <span class="stamp">TS-SDK</span></div>
-    <div class="brand-sub">unofficial · v0.2.1</div>
+    <div class="brand-sub">unofficial · v0.2.3</div>
     <nav class="toc">
       <a href="index.html">Overview</a>
       <a href="getting-started.html">Getting started</a>
@@ -42,6 +42,14 @@
   <main>
     <span class="eyebrow">Changelog</span>
     <h1>Version history</h1>
+
+    <h2>0.2.3</h2>
+    <ul style="color: var(--ink-dim);">
+      <li>Synced bundled OpenAPI spec with live Nomba docs (103 paths, 116 schemas).</li>
+      <li>New: <code>virtualAccounts.simulateInflow(identifier, { amount, senderAccountName, ... })</code> — sandbox-only endpoint <code>POST /v1/accounts/virtual/{`{identifier}`}/simulate-inflow</code>.</li>
+      <li>Virtual accounts: added <code>callbackUrl</code> and <code>mode</code> (<code>SIMULATED</code>|<code>LIVE</code>) to create requests; <code>mode</code> on virtual account responses.</li>
+      <li>Tokenized card models aligned to live spec: <code>TokenizedCardData.tokenExpiryDate</code> (YYMM), updated charge/update/delete/list response shapes, and <code>otpRequired</code>/<code>transactionId</code>/<code>orderId</code>/<code>orderReference</code> on tokenized charge responses.</li>
+    </ul>
 
     <h2>0.2.1</h2>
     <ul style="color: var(--ink-dim);">
